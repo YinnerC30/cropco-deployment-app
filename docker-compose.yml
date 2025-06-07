@@ -3,11 +3,10 @@ services:
     image: stivenc30/cropco-frontend:latest
     container_name: frontend-container
     ports:
-      - ${PORT}:80
+      - ${VITE_PORT}:80
     environment:
       - VITE_HOST_API_CROPCO=${VITE_HOST_API_CROPCO}
       - VITE_STATUS_PROJECT=${VITE_STATUS_PROJECT}
-      - PORT=${PORT}
     depends_on:
       - backend
   backend:
