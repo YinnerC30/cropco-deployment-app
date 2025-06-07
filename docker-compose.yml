@@ -3,41 +3,40 @@ services:
     image: stivenc30/cropco-frontend:latest
     container_name: frontend-container
     ports:
-      - 8081:80
+      - ${PORT}:80
     environment:
-      - VITE_HOST_API_CROPCO:http://localhost:3000/
-      - VITE_STATUS_PROJECT:development
-      - PORT:8081
+      - VITE_HOST_API_CROPCO=${VITE_HOST_API_CROPCO}
+      - VITE_STATUS_PROJECT=${VITE_STATUS_PROJECT}
+      - PORT=${PORT}
     depends_on:
       - backend
   backend:
     image: stivenc30/cropco-api-rest:latest
     container_name: backend-container
     ports:
-      - 3000:3000
+      - ${PORT_BACKEND}:3000
     environment:
-      - DB_HOST=server-db
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=root
-      - DB_NAME=cropco
-      - JWT_SECRET=millavesecreta
-      - PORT=3000
-      - HOST_FRONTED=https://cropco.netlify.app
-      - DB_CA_CERT_PATH=certs/ca-certificate.crt
-      - STATUS_PROJECT=development
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=${PORT_BACKEND}
+      - HOST_FRONTED=${HOST_FRONTED}
+      - DB_CA_CERT_PATH=${DB_CA_CERT_PATH}
+      - STATUS_PROJECT=${STATUS_PROJECT}
     depends_on:
       - db
   db:
     image: postgres:15
     container_name: server-db
     ports:
-      - '5432:5432'
+      - '${DB_PORT}:5432'
     environment:
-      POSTGRES_DB: cropco
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
-
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./data-server-db-development:/var/lib/postgresql/data
     restart: always
