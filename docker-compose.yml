@@ -1,23 +1,19 @@
 services:
   frontend:
     image: stivenc30/cropco-frontend:latest
-    # image: cropco-frontend:local
     container_name: frontend-container
     ports:
       - ${VITE_PORT_FRONTEND_CONTAINER}:80
     environment:
-      # - VITE_HOST_API_CROPCO=http://localhost:3001/
-      # - VITE_STATUS_PROJECT=development
       - VITE_HOST_API_CROPCO=${VITE_HOST_API_CROPCO}
       - VITE_STATUS_PROJECT=${VITE_STATUS_PROJECT}
     depends_on:
       - backend
   backend:
     image: stivenc30/cropco-api-rest:latest
-    # image: cropco-api-rest:latest
     container_name: backend-container
     ports:
-      - ${PORT_BACKEND_CONTAINER}:3000
+      - ${PORT_BACKEND_CONTAINER}:${PORT_BACKEND}
     environment:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
