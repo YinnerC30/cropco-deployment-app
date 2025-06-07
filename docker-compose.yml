@@ -10,7 +10,7 @@ services:
     depends_on:
       - backend
   backend:
-    image: stivenc30/cropco-api-rest:latest
+    image: stivenc30/public-cropco-api-rest:latest
     container_name: backend-container
     ports:
       - ${PORT_BACKEND_CONTAINER}:${PORT_BACKEND}
