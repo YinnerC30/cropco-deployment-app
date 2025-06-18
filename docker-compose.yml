@@ -37,7 +37,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - data-server-db-cropco:/var/lib/postgresql/data
+      - data-server-db-cropco-multi-tenant:/var/lib/postgresql/data
     restart: always
 volumes:
-  data-server-db-cropco:
+  data-server-db-cropco-multi-tenant:
