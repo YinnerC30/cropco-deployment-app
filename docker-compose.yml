@@ -9,14 +9,17 @@ services:
       - VITE_STATUS_PROJECT=${VITE_STATUS_PROJECT}
     depends_on:
       - backend
+    networks:
+      - public_cropco_network
+
   backend:
     image: stivenc30/cropco-api-rest:multi-user
     container_name: backend-container-multi-tenant
     ports:
       - ${PORT_BACKEND_CONTAINER}:${PORT_BACKEND}
     environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
+      - DB_HOST=server-db-cropco-multi-tenant # Usa el nombre del contenedor como hostname
+      - DB_PORT=5432 # Puerto interno del contenedor PostgreSQL
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
@@ -29,11 +32,13 @@ services:
       - data-logs-backend:/app/logs
     depends_on:
       - db
+    networks:
+      - public_cropco_network
+      - private_cropco_network
+
   db:
     image: postgres:15
     container_name: server-db-cropco-multi-tenant
-    ports:
-      - '${DB_PORT}:5432'
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -47,6 +52,17 @@ services:
       - data-server-db-cropco-multi-tenant:/var/lib/postgresql/data
       - ./scripts/sql:/docker-entrypoint-initdb.d/
     restart: always
+    networks:
+      - private_cropco_network
+
+networks:
+  public_cropco_network:
+    driver: bridge
+    name: public_cropco_network
+  private_cropco_network:
+    driver: bridge
+    name: private_cropco_network
+
 volumes:
   data-server-db-cropco-multi-tenant:
   data-logs-backend:
