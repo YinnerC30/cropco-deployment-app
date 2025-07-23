@@ -77,5 +77,6 @@ networks:
     name: private_cropco_network
 
 volumes:
+  data-scripts-server-db-cropco-multi-tenant:
   data-server-db-cropco-multi-tenant:
   data-logs-backend:
