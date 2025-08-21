@@ -1,6 +1,6 @@
 services:
   frontend:
-    image: stivenc30/cropco-frontend:multi-user
+    image: stivenc30/cropco-frontend:2.0.0-beta-1
     container_name: frontend-container-multi-tenant
     ports:
       - ${VITE_PORT_FRONTEND_CONTAINER}:80
@@ -13,7 +13,7 @@ services:
       - public_cropco_network
 
   backend:
-    image: stivenc30/cropco-api-rest:multi-user
+    image: stivenc30/cropco-api-rest:2.0.0-beta-1
     container_name: backend-container-multi-tenant
     ports:
       - ${PORT_BACKEND_CONTAINER}:${PORT_BACKEND}
