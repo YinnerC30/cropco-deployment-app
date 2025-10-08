@@ -1,7 +1,7 @@
 services:
   frontend:
-    image: stivenc30/cropco-frontend:latest
-    container_name: frontend-container
+    image: stivenc30/cropco-frontend:2.0.0-beta-1
+    container_name: frontend-container-multi-tenant
     ports:
       - ${VITE_PORT_FRONTEND_CONTAINER}:80
     environment:
@@ -9,35 +9,74 @@ services:
       - VITE_STATUS_PROJECT=${VITE_STATUS_PROJECT}
     depends_on:
       - backend
+    networks:
+      - public_cropco_network
+
   backend:
-    image: stivenc30/public-cropco-api-rest:latest
-    container_name: backend-container
+    image: stivenc30/cropco-api-rest:2.0.0-beta-1
+    container_name: backend-container-multi-tenant
     ports:
       - ${PORT_BACKEND_CONTAINER}:${PORT_BACKEND}
     environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
+      - DB_HOST=server-db-cropco-multi-tenant # Usa el nombre del contenedor como hostname
+      - DB_PORT=5432 # Puerto interno del contenedor PostgreSQL
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
       - JWT_SECRET=${JWT_SECRET}
       - PORT_BACKEND=${PORT_BACKEND}
       - HOST_FRONTED=${HOST_FRONTED}
-      - DB_CA_CERT_PATH=${DB_CA_CERT_PATH}
       - STATUS_PROJECT=${STATUS_PROJECT}
+      - TENANT_ENCRYPTION_KEY=${TENANT_ENCRYPTION_KEY}
+    volumes:
+      - data-logs-backend:/app/logs
     depends_on:
       - db
+    networks:
+      - public_cropco_network
+      - private_cropco_network
+
   db:
     image: postgres:15
-    container_name: server-db-cropco
-    ports:
-      - '${DB_PORT}:5432'
+    container_name: server-db-cropco-multi-tenant
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes:
-      - data-server-db-cropco:/var/lib/postgresql/data
+      - data-server-db-cropco-multi-tenant:/var/lib/postgresql/data
+      - data-scripts-server-db-cropco-multi-tenant:/docker-entrypoint-initdb.d/
     restart: always
+    networks:
+      - private_cropco_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin-cropco-multi-tenant
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - '5050:80'
+    depends_on:
+      - db
+    networks:
+      - private_cropco_network
+
+networks:
+  public_cropco_network:
+    driver: bridge
+    name: public_cropco_network
+  private_cropco_network:
+    driver: bridge
+    name: private_cropco_network
+
 volumes:
-  data-server-db-cropco:
+  data-scripts-server-db-cropco-multi-tenant:
+  data-server-db-cropco-multi-tenant:
+  data-logs-backend:
